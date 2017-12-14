@@ -5,19 +5,11 @@ Lua-Client is a Neovim client and remote plugin host.
 ### Setup
 
 1. Install this repo as a Neovim plugin using your plugin manager of choice.
-1. Install [LuaJIT](http://luajit.org/install.html)
-1. Install [LuaRocks](https://luarocks.org/#quick-start)
-1. Install the following rocks:
-
-    $ luarocks install luv 
-    $ luarcoks install mpack 
+1. Install the lua modules: luv mpack
 
 ### Development 
 
-The development environment requires the following rocks:
-
-    $ luarocks install busted
-    $ luarocks install luacheck
+The development environment requires the following rocks: busted, luacheck
 
 The script setup.sh sets up a development environment using [hererocks](https://github.com/mpeterv/hererocks#readme).
 

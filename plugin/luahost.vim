@@ -26,7 +26,7 @@ function! s:on_exit(id, data, event)
 endfunction
 
 function! s:start(host) abort
-    return jobstart('lua pmain.lua', {
+    return jobstart([v:progpath, '-u', 'NONE', '-i', 'NONE', '--headless', '-c', 'luafile pmain.lua', '-c', 'qa!'], {
         \   'rpc': 1,
         \   'cwd': s:path,
         \   'on_stderr': function('s:on_stderr'),
