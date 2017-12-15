@@ -2,7 +2,7 @@ local uv = require('luv')
 local mpack = require('mpack')
 local uvutil = require('uvutil')
 
-local async = {}
+local notify = {}
 
 local function ext_type_index(self, k)
   local mt = getmetatable(self)
@@ -29,7 +29,7 @@ local Buffer = {
   __index= ext_type_index,
   __eq = ext_type_eq,
   __tostring = ext_type_tostring,
-  async = async
+  notify = notify
 }
 
 local Window = {
@@ -37,7 +37,7 @@ local Window = {
   __index= ext_type_index,
   __eq = ext_type_eq,
   __tostring = ext_type_tostring,
-  async = async
+  notify = notify
 }
 
 local Tabpage = {
@@ -45,7 +45,7 @@ local Tabpage = {
   __index= ext_type_index,
   __eq = ext_type_eq,
   __tostring = ext_type_tostring,
-  async = async
+  notify = notify
 }
 
 local Error = {}
@@ -55,7 +55,7 @@ function Error:__tostring() return self.message end
 
 
 local Nvim = {
-  async = async
+  notify = notify
 }
 
 local function new(w, r)
@@ -213,7 +213,7 @@ function Nvim:_on_read(err, chunk)
     local mtype, id_or_cb, method_or_error, args_or_result
     mtype, id_or_cb, method_or_error, args_or_result, pos = self._session:receive(chunk, pos)
     if mtype ~= nil then
-      -- get from metatable avoid accidental call methods constructed by __index.
+      -- get from metatable avoid calling methods constructed by __index.
       local f = getmetatable(self)['_on_' .. mtype]
       if not f then
         error('unknown mpack receive type: ' .. mtype)
@@ -223,9 +223,12 @@ function Nvim:_on_read(err, chunk)
   end
 end
 
+-- request_cb sends a message to the peer and invokes cb on completion. If the
+-- last argument is the sentinel value Nvim.notify, then a notification is
+-- sent. Otherwise, a request is sent and cb is called (ok, reply or error).
 function Nvim:request_cb(cb, method, ...)
   local args = {...}
-  if #args > 0 and args[#args] == async then
+  if #args > 0 and args[#args] == notify then
     self._w:write(self._session:notify() .. self._pack(method) .. self._pack(table.remove(args)))
     cb()
     return
@@ -233,6 +236,8 @@ function Nvim:request_cb(cb, method, ...)
   self._w:write(self._session:request(cb) .. self._pack(method) .. self._pack(args))
 end
 
+-- request_level is like request_cb, except it waits for the reply from peer.
+-- If the reply is an error, then error is called with the specified level.
 function Nvim:request_level(level, method, ...)
   local cb, wait = uvutil.cb_wait()
   self:request_cb(cb, method, ...)
@@ -243,6 +248,9 @@ function Nvim:request_level(level, method, ...)
   return result
 end
 
+-- request sends a message to the peer. If the last argument is the sentinel
+-- value Nvim.notify, then a notification is sent. Otherwise, a request is sent
+-- and the reply is returned.
 function Nvim:request(method, ...)
   return self:request_level(3, method, ...)
 end
@@ -251,6 +259,7 @@ function Nvim:error(message, level)
   error(Error.new(message), level)
 end
 
+-- call calls an Nvim function and returns teh result.
 function Nvim:call(f, ...)
   return self:request_level(2, 'nvim_call_function', f, {...})
 end

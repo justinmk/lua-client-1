@@ -72,7 +72,7 @@ Return a `Tabpage` given the tabpage's integer id.
 ### Nvim:request(method, ...) -> result
 
 Send RPC API request to Nvim. Normally a blocking request is sent. If the last
-argument is the sentinel value `Nvim.async`, then an asynchronous
+argument is the sentinel value `Nvim.notify`, then an asynchronous
 notification is sent instead and any error returned from the method is ignored. 
 
 Nvim RPC API methods can also be called as methods on the Nvim, Buffer, Window
