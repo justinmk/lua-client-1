@@ -60,6 +60,12 @@ describe('nvim client', function()
       assert.are.equal(bufs[1], b)
     end)
 
+    it('not eq win', function()
+      local b = nvim:buf(1)
+      local w = nvim:win(1)
+      assert.are_not.equal(b, w)
+    end)
+
     it('method works', function()
       local buf = nvim:get_current_buf()
       assert.are.equal(1, buf:line_count())
