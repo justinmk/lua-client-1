@@ -51,7 +51,7 @@ function Error:__tostring() return self.message end
 local Endpoint = {}
 Endpoint.__index = Endpoint
 
-function Endpoint.new(w, r)
+function Endpoint.new(w, r) --> Endpoint
   local nvim = setmetatable({
     handlers = {}
   }, Nvim)
@@ -114,7 +114,7 @@ end
 
 -- request_level is like request_cb, except it waits for the reply from peer.
 -- If the reply is an error, then error is called with the specified level.
-function Endpoint:request_level(level, method, ...)
+function Endpoint:request_level(level, method, ...) --> result
   local cb, wait = uvutil.cb_wait()
   self:request_cb(cb, method, ...)
   local ok, result = wait()
@@ -173,7 +173,8 @@ function Endpoint:on_request(id, method, args)
       if getmetatable(result) == Error then
         err = result.message
       end
-      err = {0, err}
+      -- TODO: does nvim expect array in error?
+      --err = {0, err}
     end
     self.w:write(self.session:reply(id) .. self.pack(err) .. self.pack(resp))
   end)})
@@ -205,11 +206,11 @@ function Endpoint:on_response(cb, err, result)
   cb(false, err)
 end
 
-local function new(w, r)
+local function new(w, r) --> Nvim
   return Endpoint.new(w, r).nvim
 end
 
-local function new_child(cmd, args, env)
+local function new_child(cmd, args, env) --> Nvim
   local ep
   local stdin, stdout = uv.new_pipe(false), uv.new_pipe(false)
   local proc, pid = uv.spawn(cmd, {
@@ -231,7 +232,7 @@ local function new_child(cmd, args, env)
   return ep.nvim
 end
 
-local function new_stdio()
+local function new_stdio() --> Nvim
   local stdin, stdout = uv.new_pipe(false), uv.new_pipe(false)
   stdin:open(0)
   stdout:open(1)
@@ -257,7 +258,7 @@ end
 -- request sends a message to the peer. If the last argument is the sentinel
 -- value neovim.notify, then a notification is sent. Otherwise, a request is
 -- sent and the reply is returned.
-function Nvim:request(method, ...)
+function Nvim:request(method, ...) --> result
   return self._ep:request_level(3, method, ...)
 end
 
@@ -266,7 +267,7 @@ function Nvim:error(message, level)
 end
 
 -- call calls an Nvim function and returns the result.
-function Nvim:call(f, ...)
+function Nvim:call(f, ...) --> result
   return self._ep:request_level(2, 'nvim_call_function', f, {...})
 end
 

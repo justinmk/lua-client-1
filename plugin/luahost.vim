@@ -22,6 +22,9 @@ function! s:on_stderr(id, data, event)
 endfunction
 
 function! s:on_exit(id, data, event)
+    if a:data == 0
+        return
+    endif
     echom "Exit" a:data a:event
 endfunction
 

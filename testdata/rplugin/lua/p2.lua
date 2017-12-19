@@ -1,4 +1,4 @@
-local math = require('helers.math')
+local math = require('helpers.math')
 
 plugin.func {
   name = 'Sub',

@@ -36,7 +36,7 @@ buf`, `Nvim:win(id) -> win` and `Nvim:tabpage(id) -> tabpage` methods.
 The buf, win and tabpage types also expose API methods with the `nvim_type` prefix removed.
 Example: `nvim_buf_get_var` function is exposed as `buf:get_var(name) -> value`.
 
-### Nvim:request(method, ...) -> result
+### Nvim:request(method, ...) --> result
 
 Send RPC API request to Nvim. Normally a blocking request is sent. If the last
 argument is the sentinel value Nvim.notify, then an asynchronous notification
@@ -54,7 +54,7 @@ Creates a new client given a write and read
 [uv\_stream\_t](https://github.com/luvit/luv/blob/master/docs.md#uv_stream_t--stream-handle)
 handles.
 
-### new\_child(cmd, [args, [env]]) -> Nvim
+### new\_child(cmd, [args, [env]]) --> Nvim
 
 Creates a child process running the command `cmd` and returns a client connected
 to the child. Call `Nvim:close()` to end the child process. Use array `args` to
@@ -62,7 +62,7 @@ specify the command line arguments and table `env` to specify the environment.
 The `args` array should typically include `--embed`. If `env` is not set, then
 the child process environment is inherited from the current process.
 
-### new\_stdio() -> Nvim
+### new\_stdio() --> Nvim
 
 Create client connected to stdin and stdout of the current process.
 
@@ -71,19 +71,19 @@ Create client connected to stdin and stdout of the current process.
 The client dispatches incoming requests and notifications using this table. The
 keys are method names and the values are the function to call.
 
-### Nvim:buf(id) -> Buffer
+### Nvim:buf(id) --> buffer
 
-Return a `Buffer` given the buffer's integer id.
+Return a buffer given the buffer's integer id.
 
-### Nvim:win(id) -> Window
+### Nvim:win(id) --> window
 
-Return a `Window` given the window's integer id.
+Return a window given the window's integer id.
 
-### Nvim:tabpage(id) -> Tabpage
+### Nvim:tabpage(id) --> tabpage
 
-Return a `Tabpage` given the tabpage's integer id.
+Return a tabpage given the tabpage's integer id.
 
-### Nvim:request(method, ...) -> result
+### Nvim:request(method, ...) --> result
 
 Send RPC API request to Nvim. Normally a blocking request is sent. If the last
 argument is the sentinel value `Nvim.notify`, then an asynchronous
@@ -96,7 +96,7 @@ and Tabpage types. The following calls are identical:
     nvim:buf_set_var(buf, 'x', 1)   -- call method with nvim_ prefix removed
     buf:set_var('x', 1)             -- call method with nvim_buf_ prefix removed.
 
-### Nvim:call(funcname, ...) -> result
+### Nvim:call(funcname, ...) --> result
 
 Call vim function `funcname` with args `...` and return the result. This method
 is a helper for the following where `args` is an array:
